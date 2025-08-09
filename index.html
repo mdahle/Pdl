@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="nn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <title>Americano Padel Score</title>
+  <meta name="description" content="Minimal app for å halde score i Americano (padel) for 4 spelarar.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#0a84ff">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="app">
+    <header class="topbar">
+      <h1>Americano</h1>
+      <button id="installBtn" class="ghost" hidden>Installer</button>
+    </header>
+
+    <!-- Setup -->
+    <section id="setupView" class="view">
+      <div class="card">
+        <h2>Oppsett</h2>
+        <p class="muted">4 spelarar. Appen lagrar turneringa lokalt.</p>
+        <form id="setupForm">
+          <div class="grid two">
+            <label>Spelar 1<input type="text" id="p0" maxlength="12" placeholder="A" value="A" required></label>
+            <label>Spelar 2<input type="text" id="p1" maxlength="12" placeholder="B" value="B" required></label>
+            <label>Spelar 3<input type="text" id="p2" maxlength="12" placeholder="C" value="C" required></label>
+            <label>Spelar 4<input type="text" id="p3" maxlength="12" placeholder="D" value="D" required></label>
+          </div>
+          <div class="grid two">
+            <label>Poeng (X)<input type="number" id="pointsTo" min="5" max="99" step="1" value="21" required></label>
+            <label class="select">Modus
+              <select id="mode">
+                <option value="total" selected>Total X</option>
+                <option value="first">Først til X</option>
+              </select>
+            </label>
+          </div>
+          <div class="grid two" id="winBy2Row" hidden>
+            <label class="checkbox">
+              <input type="checkbox" id="winBy2"> Må vinne med 2?
+            </label>
+          </div>
+          <button class="primary wide" type="submit">Start turnering</button>
+        </form>
+      </div>
+      <details class="tips">
+        <summary>Korleis funkar Americano (4 spelarar)?</summary>
+        <p>Alle spelar med alle. Det vert tre kampar: AB vs CD, AC vs BD, AD vs BC.</p>
+        <p><strong>Total X</strong>: Kampen er ferdig når totalsummen er X (t.d. 21). Kvar spelar får like mange poeng som laget sitt scora i kampen.</p>
+        <p><strong>Først til X</strong>: Fyrste lag til X (valfritt «vinn med 2»).</p>
+      </details>
+    </section>
+
+    <!-- Match -->
+    <section id="matchView" class="view" hidden>
+      <div class="card">
+        <div class="matchHead">
+          <div>
+            <div class="round">Kamp <span id="matchNum">1</span> av <span id="matchTotal">3</span></div>
+            <div class="pairing" id="pairingTxt"></div>
+            <div class="muted small" id="ruleText"></div>
+          </div>
+          <button id="resetMatchBtn" class="ghost small">Nullstill kamp</button>
+        </div>
+
+        <div class="scoreWrap">
+          <div class="team">
+            <div class="names" id="team1Names">A + B</div>
+            <div class="score" id="score1">0</div>
+            <div class="btnRow">
+              <button class="scoreBtn" data-team="1" data-delta="1">+1</button>
+              <button class="scoreBtn ghost" data-team="1" data-delta="-1">−1</button>
+            </div>
+          </div>
+          <div class="team">
+            <div class="names" id="team2Names">C + D</div>
+            <div class="score" id="score2">0</div>
+            <div class="btnRow">
+              <button class="scoreBtn" data-team="2" data-delta="1">+1</button>
+              <button class="scoreBtn ghost" data-team="2" data-delta="-1">−1</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button id="undoBtn" class="ghost">Angre</button>
+          <button id="finishBtn" class="primary">Fullfør kamp</button>
+          <button id="nextBtn" class="accent" disabled>Neste kamp →</button>
+        </div>
+      </div>
+
+      <div class="card compact">
+        <h3>Stillingen</h3>
+        <table id="tableTotals" class="totals">
+          <thead><tr><th>Spelar</th><th>Poeng</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Summary -->
+    <section id="summaryView" class="view" hidden>
+      <div class="card">
+        <h2>Resultat</h2>
+        <ol id="leaderboard" class="leaders"></ol>
+        <div class="btnCol">
+          <button id="shareBtn" class="primary">Del resultat</button>
+          <button id="exportBtn" class="accent">Last ned JSON</button>
+          <button id="newBtn" class="ghost">Ny turnering</button>
+        </div>
+      </div>
+
+      <div class="card compact">
+        <h3>Kamp for kamp</h3>
+        <ol id="matchList" class="matchList"></ol>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js');
+      });
+    }
+  </script>
+</body>
+</html>
